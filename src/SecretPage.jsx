@@ -70,7 +70,7 @@ const SecretPage = () => {
 
         {/* Download Link */}
         <a 
-          href="/sample.pdf" 
+          href="/ss.pdf" 
           download="sample.pdf" 
           style={{ marginTop: '20px', padding: '10px 20px', backgroundColor: '#00796b', color: 'white', borderRadius: '5px', textDecoration: 'none' }}
         >
