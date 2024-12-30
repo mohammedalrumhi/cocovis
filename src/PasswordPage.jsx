@@ -19,11 +19,11 @@ const PasswordPage = () => {
   // Inline styles for password page with responsive design
   const pageStyles = {
     display: 'flex',
+    width: '100%',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     height: '100vh',
-    backgroundColor: '#f0f0f0',
     fontFamily: 'Arial, sans-serif',
     direction: 'rtl', // Right-to-left text direction for Arabic
     padding: '0 20px',
