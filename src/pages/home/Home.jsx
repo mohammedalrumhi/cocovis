@@ -1,17 +1,34 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import styles from "./home.module.scss";
 import NavBar from "../../components/navbar/NavBar";
 import Body from "../../components/body/Body";
-import MapContainer from "../tracking/MapContainer";
+import { AuthContext } from "../../contexts/AuthContext";
+
 const Home = () => {
-  const [updateFeed, setUpdateFeed] = useState(false);
+  const { currentUser } = useContext(AuthContext);
+
+
+
+
+
+  useEffect(() => {
+    const userId = currentUser.user.email;  // Replace with actual user ID
+    startLocationTracking(userId);
+  }, []);
+
+
+
 
   return (
     <>
       <div className={`${styles.home} `}>
-        <NavBar setUpdateFeed={setUpdateFeed} updateFeed={updateFeed} />
-      
-        <Body updateFeed={updateFeed} />
+       
+        
+      <div>
+      <h1>Tracking Location...</h1>
+    </div>
+
+
       </div>
     </>
   );

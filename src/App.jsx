@@ -6,7 +6,7 @@ import { useContext } from "react";
 import { AuthContext } from "./contexts/AuthContext";
 import Files from "./pages/files/Files";
 import "./App.css";
-import MapContainer from "./pages/tracking/MapContainer";
+
 function App() {
   const { currentUser } = useContext(AuthContext);
 
@@ -40,14 +40,7 @@ function App() {
               </IsLogged>
             }
           ></Route>
-              <Route
-            path="/map"
-            element={
-              <IsLogged>
-                <MapContainer />
-              </IsLogged>
-            }
-          ></Route>
+ 
 
           <Route
             path="/files/:groupId"

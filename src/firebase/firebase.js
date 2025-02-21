@@ -416,4 +416,74 @@ export const deleteEvent = async (eventId) => {
 };
 
 
+
+
+// Function to request permission and get the current location
+const getCurrentLocation = () => {
+  return new Promise((resolve, reject) => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0
+      });
+    } else {
+      reject(new Error("Geolocation is not supported by this browser."));
+    }
+  });
+};
+
+// Function to track location every 5 seconds
+const startLocationTracking = async (userId) => {
+  try {
+    // Check permissions and get the first location
+    await getCurrentLocation()
+      .then(async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        // Send the first location to Firebase
+        await sendLocationToFirebase(userId, latitude, longitude);
+        
+        // Start the 5s interval to update location
+        setInterval(async () => {
+          try {
+            const position = await getCurrentLocation();
+            const { latitude, longitude } = position.coords;
+
+            // Send the updated location to Firebase
+            await sendLocationToFirebase(userId, latitude, longitude);
+          } catch (error) {
+            console.error("Error getting location:", error);
+          }
+        }, 5000);  // 5 seconds interval
+      })
+      .catch((error) => {
+        console.error("Error getting location:", error);
+      });
+  } catch (error) {
+    console.error("Error initializing location tracking:", error);
+  }
+};
+
+// Function to send location to Firestore
+const sendLocationToFirebase = async (userId, latitude, longitude) => {
+  try {
+    // Create a new document in the "locations" collection with the user's location
+    await addDoc(collection(firestore, "locations"), {
+      userId: userId,
+      latitude: latitude,
+      longitude: longitude,
+      timestamp: new Date(),
+    });
+
+    console.log("Location sent to Firestore successfully!");
+  } catch (error) {
+    console.error("Error sending location to Firestore:", error);
+  }
+};
+
+export { startLocationTracking };
+
+
+
 export default app;
