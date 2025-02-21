@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../contexts/AuthContext";
-import { startLocationTracking } from "../../firebase/firebase";
+import { startLocationTracking, updateLocationInFirebase } from "../../firebase/firebase"; // Assuming you have this function in firebase.js
 
 const Home = () => {
   const { currentUser } = useContext(AuthContext);
-  
+
   // Define state to hold latitude, longitude, and message
   const [location, setLocation] = useState({
     latitude: null,
@@ -15,23 +15,29 @@ const Home = () => {
   // Inform the user that the location will be updated every 5 seconds
   const [infoMessage, setInfoMessage] = useState("سيتم تحديث الموقع كل 5 ثواني");
 
-  // Update location in the state
+  // Update location in the state and Firebase
   const updateLocation = (latitude, longitude) => {
+    // Update the local state
     setLocation({
       latitude: latitude,
       longitude: longitude,
       message: "تم تحديث الموقع بنجاح", // Arabic message (Location updated successfully)
     });
+
+    // Now send the updated location to Firebase
+    if (currentUser) {
+      updateLocationInFirebase(currentUser.user.email, latitude, longitude);
+    }
   };
 
   // Start location tracking when the component mounts
   useEffect(() => {
     const userId = currentUser.user.email;  // Use email or userId for Firebase
-    startLocationTracking(userId); // Start tracking location every 5s
+    startLocationTracking(userId); // Start tracking location every 5 seconds
   }, [currentUser]);
 
   useEffect(() => {
-    // Subscribe to the location updates
+    // Subscribe to the location updates every 5 seconds
     const interval = setInterval(() => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -46,6 +52,11 @@ const Home = () => {
               longitude: null,
               message: "فشل في الحصول على الموقع", // Arabic message (Failed to get location)
             });
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0,
           }
         );
       }
