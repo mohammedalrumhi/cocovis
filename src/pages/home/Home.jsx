@@ -1,7 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../contexts/AuthContext";
 import { startLocationTracking, updateLocationInFirebase } from "../../firebase/firebase"; // Assuming you have this function in firebase.js
-import { Navbar } from "../../components/navbar";
+import NavBar from "../../components/navbar/NavBar";
+
+
 const Home = () => {
   const { currentUser } = useContext(AuthContext);
 
@@ -26,13 +28,13 @@ const Home = () => {
 
     // Now send the updated location to Firebase
     if (currentUser) {
-      updateLocationInFirebase(currentUser.user.email, latitude, longitude);
+      updateLocationInFirebase(currentUser.user.uid,currentUser.user.name,currentUser.user.email ,latitude, longitude);
     }
   };
 
   // Start location tracking when the component mounts
   useEffect(() => {
-    const userId = currentUser.user.email;  // Use email or userId for Firebase
+    const userId = currentUser.user.uid;  // Use email or userId for Firebase
     startLocationTracking(userId); // Start tracking location every 5 seconds
   }, [currentUser]);
 
@@ -68,7 +70,7 @@ const Home = () => {
 
   return (
     <>
-    <Navbar/>
+    <NavBar/>
        
       <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
         <div className="bg-white p-6 rounded-lg shadow-md">

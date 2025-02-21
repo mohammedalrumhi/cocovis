@@ -452,14 +452,14 @@ const getCurrentLocation = () => {
 };
 
 // Function to track location every 5 seconds
-const startLocationTracking = async (userId) => {
+const startLocationTracking = async (userId, userName, userEmail) => {
   try {
     // Request permission and get the first location
     const position = await getCurrentLocation();
     const { latitude, longitude } = position.coords;
 
-    // Update the location in Firebase
-    await updateLocationInFirebase(userId, latitude, longitude);
+    // Update the location in Firebase with name and email
+    await updateLocationInFirebase(userId, userName, userEmail, latitude, longitude);
     
     // Start tracking location every 5 seconds
     setInterval(async () => {
@@ -467,8 +467,8 @@ const startLocationTracking = async (userId) => {
         const position = await getCurrentLocation();
         const { latitude, longitude } = position.coords;
 
-        // Update the location in Firebase
-        await updateLocationInFirebase(userId, latitude, longitude);
+        // Update the location in Firebase with name and email
+        await updateLocationInFirebase(userId, userName, userEmail, latitude, longitude);
       } catch (error) {
         console.error("Error getting location:", error);
       }
@@ -481,7 +481,7 @@ const startLocationTracking = async (userId) => {
 };
 
 // Function to update location in Firebase
-const updateLocationInFirebase = async (userId, latitude, longitude) => {
+const updateLocationInFirebase = async (userId, userName, userEmail, latitude, longitude) => {
   try {
     // Get a reference to the user's location document in Firestore
     const locationRef = doc(firestore, "locations", userId); // Use userId as document ID
@@ -490,20 +490,24 @@ const updateLocationInFirebase = async (userId, latitude, longitude) => {
     const locationDoc = await getDoc(locationRef);
 
     if (locationDoc.exists()) {
-      // If the document exists, update latitude and longitude
+      // If the document exists, update latitude, longitude, name, and email
       await updateDoc(locationRef, {
         latitude: latitude,
         longitude: longitude,
-        timestamp: new Date(), // Optionally add a timestamp
+        userName: userName,       // Add the user's name
+        userEmail: userEmail,     // Add the user's email
+        timestamp: new Date(),    // Optionally add a timestamp
       });
       console.log("Location updated successfully!");
     } else {
       // If the document doesn't exist, create a new document with location data
       await setDoc(locationRef, {
         userId: userId,
+        userName: userName,       // Add the user's name
+        userEmail: userEmail,     // Add the user's email
         latitude: latitude,
         longitude: longitude,
-        timestamp: new Date(), // Optionally add a timestamp
+        timestamp: new Date(),    // Optionally add a timestamp
       });
       console.log("Location document created!");
     }
@@ -511,6 +515,7 @@ const updateLocationInFirebase = async (userId, latitude, longitude) => {
     console.error("Error updating location in Firestore:", error);
   }
 };
+
 
 export { startLocationTracking ,updateLocationInFirebase};
 
