@@ -7,6 +7,9 @@ import NavBar from "../../components/navbar/NavBar";
 const Home = () => {
   const { currentUser } = useContext(AuthContext);
 
+
+
+
   // Define state to hold latitude, longitude, and message
   const [location, setLocation] = useState({
     latitude: null,
@@ -15,7 +18,7 @@ const Home = () => {
   });
 
   // Inform the user that the location will be updated every 5 seconds
-  const [infoMessage, setInfoMessage] = useState("سيتم تحديث الموقع كل 5 ثواني");
+  const [infoMessage, setInfoMessage] = useState(" سيتم تحديث الموقع كل 5 ثواني");
 
   // Update location in the state and Firebase
   const updateLocation = (latitude, longitude) => {
@@ -28,14 +31,15 @@ const Home = () => {
 
     // Now send the updated location to Firebase
     if (currentUser) {
-      updateLocationInFirebase(currentUser.user.uid,currentUser.user.name,currentUser.user.email ,latitude, longitude);
+      console.log("these sss : "+currentUser);
+      updateLocationInFirebase(currentUser.auth.uid,currentUser.user.name,currentUser.auth.email ,latitude, longitude);
     }
   };
 
   // Start location tracking when the component mounts
   useEffect(() => {
-    const userId = currentUser.user.uid;  // Use email or userId for Firebase
-    startLocationTracking(userId); // Start tracking location every 5 seconds
+    const userId = currentUser.uid;  // Use email or userId for Firebase
+    startLocationTracking(userId,currentUser.user.name,currentUser.auth.email); // Start tracking location every 5 seconds
   }, [currentUser]);
 
   useEffect(() => {
@@ -78,7 +82,7 @@ const Home = () => {
           <div className="text-center mb-4">
             <p className="text-sm text-blue-500 font-medium">{infoMessage}</p>
           </div>
-
+          <h1 className="text-2xl font-bold mb-4"> تاكد من تفعيل GPS</h1>
           <h1 className="text-2xl font-bold mb-4">موقعك الحالي:</h1>
 
           {/* Display Latitude and Longitude */}

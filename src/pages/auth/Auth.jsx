@@ -9,6 +9,7 @@ const Auth = () => {
   const [state, dispatch] = useReducer(authReducer, {
     email: "",
     password: "",
+    name :"",
     errorMessage: "",
   });
 
@@ -24,7 +25,7 @@ const Auth = () => {
 
   const { dispatch: authDispatch } = useContext(AuthContext);
 
-  const { email, password, errorMessage, loading } = state;
+  const { email, password,name , errorMessage, loading } = state;
   const toPage = useNavigate();
 
   const handleLogin = async (e) => {

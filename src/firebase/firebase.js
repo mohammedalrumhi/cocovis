@@ -483,6 +483,8 @@ const startLocationTracking = async (userId, userName, userEmail) => {
 // Function to update location in Firebase
 const updateLocationInFirebase = async (userId, userName, userEmail, latitude, longitude) => {
   try {
+
+    console.log(userId,userName,userEmail);
     // Get a reference to the user's location document in Firestore
     const locationRef = doc(firestore, "locations", userId); // Use userId as document ID
     
