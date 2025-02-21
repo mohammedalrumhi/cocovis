@@ -416,17 +416,36 @@ export const deleteEvent = async (eventId) => {
 };
 
 
-
-
 // Function to request permission and get the current location
 const getCurrentLocation = () => {
   return new Promise((resolve, reject) => {
+    // Check if geolocation is available in the browser
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(resolve, reject, {
-        enableHighAccuracy: true,
-        timeout: 5000,
-        maximumAge: 0
-      });
+      // Request the user's location
+      navigator.geolocation.getCurrentPosition(
+        // Success callback
+        (position) => {
+          resolve(position);
+        },
+        // Error callback
+        (error) => {
+          // Check if the error was caused by user denying the permission
+          if (error.code === error.PERMISSION_DENIED) {
+            reject(new Error("Permission to access location was denied."));
+          } else if (error.code === error.POSITION_UNAVAILABLE) {
+            reject(new Error("Location information is unavailable."));
+          } else if (error.code === error.TIMEOUT) {
+            reject(new Error("The request to get the user's location timed out."));
+          } else {
+            reject(new Error("An unknown error occurred while retrieving the location."));
+          }
+        },
+        {
+          enableHighAccuracy: true,  // Use the most accurate location data
+          timeout: 5000,             // Maximum time to wait for location in ms
+          maximumAge: 0             // Don't use cached location data
+        }
+      );
     } else {
       reject(new Error("Geolocation is not supported by this browser."));
     }
@@ -436,36 +455,33 @@ const getCurrentLocation = () => {
 // Function to track location every 5 seconds
 const startLocationTracking = async (userId) => {
   try {
-    // Check permissions and get the first location
-    await getCurrentLocation()
-      .then(async (position) => {
+    // Request permission and get the first location
+    const position = await getCurrentLocation();
+    const { latitude, longitude } = position.coords;
+
+    // Send the first location to Firebase
+    await sendLocationToFirebase(userId, latitude, longitude);
+    
+    // Start tracking location every 5 seconds
+    setInterval(async () => {
+      try {
+        const position = await getCurrentLocation();
         const { latitude, longitude } = position.coords;
 
-        // Send the first location to Firebase
+        // Send the updated location to Firebase
         await sendLocationToFirebase(userId, latitude, longitude);
-        
-        // Start the 5s interval to update location
-        setInterval(async () => {
-          try {
-            const position = await getCurrentLocation();
-            const { latitude, longitude } = position.coords;
-
-            // Send the updated location to Firebase
-            await sendLocationToFirebase(userId, latitude, longitude);
-          } catch (error) {
-            console.error("Error getting location:", error);
-          }
-        }, 5000);  // 5 seconds interval
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error getting location:", error);
-      });
+      }
+    }, 5000); // Update every 5 seconds
   } catch (error) {
+    // Handle errors when trying to get location
     console.error("Error initializing location tracking:", error);
+    alert(error.message); // Show error message to the user
   }
 };
 
-// Function to send location to Firestore
+// Function to send location to Firebase
 const sendLocationToFirebase = async (userId, latitude, longitude) => {
   try {
     // Create a new document in the "locations" collection with the user's location
