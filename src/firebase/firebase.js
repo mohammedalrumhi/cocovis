@@ -512,7 +512,7 @@ const updateLocationInFirebase = async (userId, latitude, longitude) => {
   }
 };
 
-export { startLocationTracking };
+export { startLocationTracking ,updateLocationInFirebase};
 
 
 
