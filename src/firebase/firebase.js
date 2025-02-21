@@ -415,7 +415,6 @@ export const deleteEvent = async (eventId) => {
   }
 };
 
-
 // Function to request permission and get the current location
 const getCurrentLocation = () => {
   return new Promise((resolve, reject) => {
@@ -431,11 +430,11 @@ const getCurrentLocation = () => {
         (error) => {
           // Check if the error was caused by user denying the permission
           if (error.code === error.PERMISSION_DENIED) {
-            reject(new Error("Permission to access location was denied."));
+            reject(new Error("تم رفض صلاحية الرجاء تشغيل الموقع في جهازك"));
           } else if (error.code === error.POSITION_UNAVAILABLE) {
-            reject(new Error("Location information is unavailable."));
+            reject(new Error("معلومات الموقع غير متوفرة"));
           } else if (error.code === error.TIMEOUT) {
-            reject(new Error("The request to get the user's location timed out."));
+            reject(new Error("حاول مرة أخرى"));
           } else {
             reject(new Error("An unknown error occurred while retrieving the location."));
           }
@@ -459,8 +458,8 @@ const startLocationTracking = async (userId) => {
     const position = await getCurrentLocation();
     const { latitude, longitude } = position.coords;
 
-    // Send the first location to Firebase
-    await sendLocationToFirebase(userId, latitude, longitude);
+    // Update the location in Firebase
+    await updateLocationInFirebase(userId, latitude, longitude);
     
     // Start tracking location every 5 seconds
     setInterval(async () => {
@@ -468,8 +467,8 @@ const startLocationTracking = async (userId) => {
         const position = await getCurrentLocation();
         const { latitude, longitude } = position.coords;
 
-        // Send the updated location to Firebase
-        await sendLocationToFirebase(userId, latitude, longitude);
+        // Update the location in Firebase
+        await updateLocationInFirebase(userId, latitude, longitude);
       } catch (error) {
         console.error("Error getting location:", error);
       }
@@ -481,20 +480,35 @@ const startLocationTracking = async (userId) => {
   }
 };
 
-// Function to send location to Firebase
-const sendLocationToFirebase = async (userId, latitude, longitude) => {
+// Function to update location in Firebase
+const updateLocationInFirebase = async (userId, latitude, longitude) => {
   try {
-    // Create a new document in the "locations" collection with the user's location
-    await addDoc(collection(firestore, "locations"), {
-      userId: userId,
-      latitude: latitude,
-      longitude: longitude,
-      timestamp: new Date(),
-    });
+    // Get a reference to the user's location document in Firestore
+    const locationRef = doc(firestore, "locations", userId); // Use userId as document ID
+    
+    // Check if the document exists
+    const locationDoc = await getDoc(locationRef);
 
-    console.log("Location sent to Firestore successfully!");
+    if (locationDoc.exists()) {
+      // If the document exists, update latitude and longitude
+      await updateDoc(locationRef, {
+        latitude: latitude,
+        longitude: longitude,
+        timestamp: new Date(), // Optionally add a timestamp
+      });
+      console.log("Location updated successfully!");
+    } else {
+      // If the document doesn't exist, create a new document with location data
+      await setDoc(locationRef, {
+        userId: userId,
+        latitude: latitude,
+        longitude: longitude,
+        timestamp: new Date(), // Optionally add a timestamp
+      });
+      console.log("Location document created!");
+    }
   } catch (error) {
-    console.error("Error sending location to Firestore:", error);
+    console.error("Error updating location in Firestore:", error);
   }
 };
 
