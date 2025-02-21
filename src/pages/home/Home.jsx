@@ -3,6 +3,7 @@ import styles from "./home.module.scss";
 import NavBar from "../../components/navbar/NavBar";
 import Body from "../../components/body/Body";
 import { AuthContext } from "../../contexts/AuthContext";
+import { startLocationTracking } from "../../firebase/firebase";
 
 const Home = () => {
   const { currentUser } = useContext(AuthContext);
@@ -12,7 +13,7 @@ const Home = () => {
 
 
   useEffect(() => {
-    const userId = currentUser.user.email;  // Replace with actual user ID
+    const userId = currentUser.user.email;  
     startLocationTracking(userId);
   }, []);
 
