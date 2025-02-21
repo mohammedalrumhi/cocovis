@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../contexts/AuthContext";
 import { startLocationTracking, updateLocationInFirebase } from "../../firebase/firebase"; // Assuming you have this function in firebase.js
-
+import { Navbar } from "../../components/navbar";
 const Home = () => {
   const { currentUser } = useContext(AuthContext);
 
@@ -68,6 +68,8 @@ const Home = () => {
 
   return (
     <>
+    <Navbar/>
+       
       <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
         <div className="bg-white p-6 rounded-lg shadow-md">
           {/* Info message to inform the user about the 5-second updates */}
