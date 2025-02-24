@@ -62,7 +62,7 @@ const Auth = () => {
         <div className="flex flex-col justify-center items-center">
           <img src="/logo.svg" width={90} alt="Logo" />
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-800">
-نظام العمليات          </h2>
+موقع طلبات الطعام       </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
           <div className="rounded-md shadow-sm -space-y-px">

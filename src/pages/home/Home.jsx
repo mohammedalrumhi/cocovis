@@ -43,7 +43,7 @@ const Home = () => {
   }, [currentUser]);
 
   useEffect(() => {
-    // Subscribe to the location updates every 5 seconds
+    // Subscribe to the location updates every 1 second
     const interval = setInterval(() => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -66,12 +66,12 @@ const Home = () => {
           }
         );
       }
-    }, 5000); // Update every 5 seconds
-
+    }, 1000); // Update every 1 second
+  
     // Cleanup interval when component unmounts
     return () => clearInterval(interval);
   }, []);
-
+  
   return (
     <>
     <NavBar/>
